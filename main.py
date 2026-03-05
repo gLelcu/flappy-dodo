@@ -7,6 +7,12 @@ from pygame.locals import *
 # initialize Pygame
 pygame.init()
 
+def trim_transparent(surface):
+    rect = surface.get_bounding_rect()
+    if rect.width == 0 or rect.height == 0:
+        return surface
+    return surface.subsurface(rect).copy()
+
 #stats
 score = 0
 high_score = 0
@@ -34,7 +40,18 @@ die_sfx = pygame.mixer.Sound("sfx/die.mp3")
 
 bg_img = pygame.image.load("assets/dodoflappybg.png")
 ground_img = pygame.image.load("assets/ground.png")
-dodo_img = pygame.image.load("assets/dodojump1.png")
+dodo_scale = 2.00
+dodo_img = trim_transparent(pygame.image.load("assets/dodojump1.png").convert_alpha())
+dodojump_img = trim_transparent(pygame.image.load("assets/dodojump.png").convert_alpha())
+dodo_img = pygame.transform.scale(
+    dodo_img,
+    (int(dodo_img.get_width() * dodo_scale), int(dodo_img.get_height() * dodo_scale))
+)
+dodojump_img = pygame.transform.scale(
+    dodojump_img,
+    dodo_img.get_size()
+)
+
 pipe_down_img = pygame.image.load("assets/pipe_down.png")
 pipe_up_img = pygame.image.load("assets/pipe_up.png")
 pipe_down_img = pygame.transform.scale(pipe_down_img, (200, 560))
@@ -46,6 +63,8 @@ ground_img = pygame.transform.scale(ground_img, (w_width, ground_img.get_height(
 bg_scroll_speed = 1
 # moving ground
 ground_scroll_speed = 2
+# smaller gap makes top/bottom pipes closer
+pipe_gap_size = 170
 
 
 def load_high_score():
@@ -79,7 +98,7 @@ class dodo_player:
 
 
     def jump(self):
-        self.velocity = -10
+        self.velocity = -10 
 
 
     def update(self):
@@ -88,7 +107,8 @@ class dodo_player:
 
 
     def draw(self):
-        screen.blit(dodo_img, (self.x, self.y))
+        sprite = dodojump_img if self.velocity < 0 else dodo_img
+        screen.blit(sprite, (self.x, self.y))
     
 
 # pipe class
@@ -129,8 +149,8 @@ def game():
     ground_x_pos = 0
     high_score = load_high_score()
 
-    dodo = dodo_player(168, 300)
-    pipes = [Pipe(600, random.randint(30, 250), 220, 2.4)]
+    dodo = dodo_player(200, 300)
+    pipes = [Pipe(600, random.randint(30, 250), pipe_gap_size, 2.4)]
 
     while game_state != 0:
         # gameplay
@@ -157,8 +177,8 @@ def game():
                             pipe_top_height = pipe.height
                             pipe_gap = pipe.gap
                             pipe_bottom_y = pipe_top_height + pipe_gap
-                            pipe_padding_x = 10
-                            pipe_padding_y = 8
+                            pipe_padding_x = 60
+                            pipe_padding_y = 60
 
                             pipe_top_rect = pygame.Rect(
                                 pipe.x + pipe_padding_x,
@@ -175,16 +195,17 @@ def game():
 
                             if dodo_rect.colliderect(pipe_top_rect) or dodo_rect.colliderect(pipe_bottom_rect):
                                 high_score = update_high_score(score, high_score)
-                                dodo = dodo_player(168, 300)
-                                pipes = [Pipe(600, random.randint(30, 250), 220, 2.4)]
+                                dodo = dodo_player(200, 300)
+                                pipes = [Pipe(600, random.randint(30, 250), pipe_gap_size, 2.4)]
                                 score = 0
                                 has_moved = False
                                 pygame.mixer.Sound.play(die_sfx)
+                                break
 
-                        if dodo.y < -64 or dodo.y > 536:
+                        if dodo.y < -536 or dodo.y > 689:
                             high_score = update_high_score(score, high_score)
-                            dodo = dodo_player(168, 300)
-                            pipes = [Pipe(600, random.randint(30, 250), 220, 2.4)]
+                            dodo = dodo_player(200, 300)
+                            pipes = [Pipe(600, random.randint(30, 250), pipe_gap_size, 2.4)]
                             score = 0
                             has_moved = False
                             pygame.mixer.Sound.play(die_sfx)
@@ -194,7 +215,7 @@ def game():
 
                         if pipes[0].x < -pipe_up_img.get_width():
                             pipes.pop(0)
-                            pipes.append(Pipe(400, random.randint(30, 280), 220, 2.4))
+                            pipes.append(Pipe(280, random.randint(30, 280), pipe_gap_size, 2.4))
 
 
                         for pipe in pipes:
@@ -232,5 +253,6 @@ game()
                 
     
                    
+
 
 
