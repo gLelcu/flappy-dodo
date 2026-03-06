@@ -64,7 +64,12 @@ bg_scroll_speed = 1
 # moving ground
 ground_scroll_speed = 2
 # smaller gap makes top/bottom pipes closer
-pipe_gap_size = 170
+pipe_gap_size = 100
+pipe_spacing = 320
+
+
+def make_pipe(x):
+    return Pipe(x, random.randint(30, 280), pipe_gap_size, 2.4)
 
 
 def load_high_score():
@@ -150,7 +155,7 @@ def game():
     high_score = load_high_score()
 
     dodo = dodo_player(200, 300)
-    pipes = [Pipe(600, random.randint(30, 250), pipe_gap_size, 2.4)]
+    pipes = [make_pipe(600), make_pipe(600 + pipe_spacing)]
 
     while game_state != 0:
         # gameplay
@@ -196,7 +201,7 @@ def game():
                             if dodo_rect.colliderect(pipe_top_rect) or dodo_rect.colliderect(pipe_bottom_rect):
                                 high_score = update_high_score(score, high_score)
                                 dodo = dodo_player(200, 300)
-                                pipes = [Pipe(600, random.randint(30, 250), pipe_gap_size, 2.4)]
+                                pipes = [make_pipe(600), make_pipe(600 + pipe_spacing)]
                                 score = 0
                                 has_moved = False
                                 pygame.mixer.Sound.play(die_sfx)
@@ -205,7 +210,7 @@ def game():
                         if dodo.y < -536 or dodo.y > 689:
                             high_score = update_high_score(score, high_score)
                             dodo = dodo_player(200, 300)
-                            pipes = [Pipe(600, random.randint(30, 250), pipe_gap_size, 2.4)]
+                            pipes = [make_pipe(600), make_pipe(600 + pipe_spacing)]
                             score = 0
                             has_moved = False
                             pygame.mixer.Sound.play(die_sfx)
@@ -215,7 +220,7 @@ def game():
 
                         if pipes[0].x < -pipe_up_img.get_width():
                             pipes.pop(0)
-                            pipes.append(Pipe(280, random.randint(30, 280), pipe_gap_size, 2.4))
+                            pipes.append(make_pipe(pipes[-1].x + pipe_spacing))
 
 
                         for pipe in pipes:
@@ -253,6 +258,3 @@ game()
                 
     
                    
-
-
-
