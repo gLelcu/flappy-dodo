@@ -69,7 +69,9 @@ pipe_spacing = 320
 
 
 def make_pipe(x):
-    return Pipe(x, random.randint(30, 280), pipe_gap_size, 2.4)
+top_margin = 40
+bottom_limit = 536 - 40 - pipe_gap_size
+return Pipe(x, random.randint(top_margin, bottom_limit), pipe_gap_size, 2.4)
 
 
 def load_high_score():
