@@ -64,15 +64,15 @@ bg_scroll_speed = 1
 # moving ground
 ground_scroll_speed = 2
 # smaller gap makes top/bottom pipes closer
-pipe_gap_size = 113
+pipe_gap_size = 115
 pipe_spacing = 320
 
+## pipe spawn
 
 def make_pipe(x):
-top_margin = 40
-bottom_limit = 536 - 40 - pipe_gap_size
-return Pipe(x, random.randint(top_margin, bottom_limit), pipe_gap_size, 2.4)
-
+	top_limit = 40
+	bottom_limit = 536 - top_limit - pipe_gap_size
+	return  Pipe(x, random.randint(top_limit, bottom_limit), pipe_gap_size, 2.5)
 
 def load_high_score():
     try:
